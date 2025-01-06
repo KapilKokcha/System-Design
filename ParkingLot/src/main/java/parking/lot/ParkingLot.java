@@ -2,17 +2,23 @@ package parking.lot;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ParkingLot {
+    final List<EntryGate> entryGates;
+    final List<ExitGate> exitGates;
     Map<VehicleType, List<ParkingSpot>> parkingSpace;
 
     public ParkingLot(Map<VehicleType, List<ParkingSpot>> parkingSpace) {
-        this.parkingSpace = parkingSpace;
+        this.parkingSpace = new ConcurrentHashMap<>(parkingSpace);
+        this.entryGates = new ArrayList<>();
+        this.exitGates = new ArrayList<>();
     }
 
-    public ParkingSpot parkVehicle(Vehicle vehicle) {
+    public synchronized ParkingSpot parkVehicle(Vehicle vehicle) {
         for (ParkingSpot parkingSpot : this.parkingSpace.get(vehicle.type)) {
             if (parkingSpot.isAvailable) {
                 parkingSpot.parkVehicle(vehicle);
